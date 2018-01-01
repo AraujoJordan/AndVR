@@ -51,14 +51,14 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         camera.getTransformation().setTranslation(0, 0f, 0f);
         gameEngine.addCamera(camera);
 
-        Entity testCube = new Entity("cube");
-        testCube.addComponent(new Transformation(0,0,-3f));
-        testCube.addComponent(new Model3D("porche", gameEngine,
-                new Color(1f,0f,0f, 1f)));
-        gameEngine.addEntity(testCube);
-        birdsListForTrans.add(testCube);
+//        Entity testCube = new Entity("cube");
+//        testCube.addComponent(new Transformation(0,0,-3f));
+//        testCube.addComponent(new Model3D("porche", gameEngine,
+//                new Color(1f,0f,0f, 1f)));
+//        gameEngine.addEntity(testCube);
+//        birdsListForTrans.add(testCube);
 
-//        birdsListForTrans = addObjects(15);
+        birdsListForTrans = addObjects(15);
 
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {

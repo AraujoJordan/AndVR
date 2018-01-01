@@ -10,7 +10,8 @@ import java.util.HashMap;
 public class BufferCache {
     public static BufferCache instance = null;
 
-    public HashMap<String,FloatBuffer> bufferHash;
+    public HashMap<String,int[]> modelBuffer;
+    public HashMap<String,Integer> textureBuffer;
 
     public static BufferCache getInstance() {
         if(instance == null) {
