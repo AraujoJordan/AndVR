@@ -22,7 +22,7 @@ public abstract class GenericObject3D {
     public Vector3D center;
     public int textureVTSize;
 
-    public BufferFactory vertBuffer, normalBuffer, textureBuffer;
+    public BufferFactory vertBuffer, normalBuffer, textureBuffer, uvwBuffer;
     public int vertSize = 0;
 
     public float width, height, depth;

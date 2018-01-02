@@ -38,7 +38,7 @@ public class GameResources {
                 throw new IOException("File " + fileName + " in assets folder doesn't exist. Check if the assets folder and the file is there");
 
 //            GenericObject3D obj = new ManualWavefront(idLabel, act.getAssets().open(fileName));
-            GenericObject3D obj = new MokiatWavefront(idLabel, act.getAssets().open(fileName));
+            GenericObject3D obj = new MokiatWavefront(act, idLabel, act.getAssets().open(fileName));
             object3dList.put(idLabel, obj);
             Log.v(getClass().getSimpleName(), "GenericObject3D added on hash");
         } catch (Exception error) {
