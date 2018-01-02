@@ -17,7 +17,7 @@ import araujo.jordan.andvr.engine.VrActivity;
 import araujo.jordan.andvr.engine.draw.Color;
 import araujo.jordan.andvr.engine.entity.Entity;
 import araujo.jordan.andvr.engine.renderer.GLUtils;
-import araujo.jordan.andvr.engine.resources.Object3D;
+import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
 import araujo.jordan.andvr.engine.utils.BufferFactory;
 
 /**
@@ -47,7 +47,7 @@ public class ModelDrawVR implements Draw {
     private final int mTextureUniformHandle;
     private final int mTextureCoordinateHandle;
 
-    private float color[] = {0.1f, 1.0f, 0.1f, 1.0f};
+    private float color[] = {0.1f, 1.0f, 0.1f, 1.0f}; //default color
     private int vertexCount;
 
     private Entity entity;
@@ -56,7 +56,7 @@ public class ModelDrawVR implements Draw {
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public ModelDrawVR(Object3D obj3D, int textureID, VREngine engine, Entity entity, Color colorObj) {
+    public ModelDrawVR(String objectID, GenericObject3D obj3D, int textureID, VREngine engine, Entity entity, Color colorObj) {
         this.entity = entity;
         this.textureID = textureID;
         this.engine = engine;
@@ -78,6 +78,9 @@ public class ModelDrawVR implements Draw {
 
         vertexCount = obj3D.vertSize / COORDS_PER_VERTEX;
 
+//        if(BufferCache.getInstance().bufferHash.containsKey(obj3D.id)) {
+//
+//        }
         vertexBuffer = obj3D.vertBuffer.getFloatBuffer();
 //        normalBuffer = new BufferFactory(createNormals()).getFloatBuffer();
         normalBuffer = obj3D.normalBuffer.getFloatBuffer();

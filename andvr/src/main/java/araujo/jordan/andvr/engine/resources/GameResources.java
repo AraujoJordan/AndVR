@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 
+import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
+import araujo.jordan.andvr.engine.resources.object3D.ManualWavefront;
+import araujo.jordan.andvr.engine.resources.object3D.MokiatWavefront;
 import araujo.jordan.andvr.engine.texture.TextureHelper;
 
 /**
@@ -16,7 +19,7 @@ import araujo.jordan.andvr.engine.texture.TextureHelper;
  */
 public class GameResources {
 
-    private Hashtable<String, Object3D> object3dList;
+    private Hashtable<String, GenericObject3D> object3dList;
     private boolean isLoaded;
     private Hashtable<String, Integer> textureList;
 
@@ -34,9 +37,10 @@ public class GameResources {
             if (!Arrays.asList(act.getResources().getAssets().list("")).contains(fileName))
                 throw new IOException("File " + fileName + " in assets folder doesn't exist. Check if the assets folder and the file is there");
 
-            Object3D obj = new Object3D(act.getAssets().open(fileName));
+//            GenericObject3D obj = new ManualWavefront(idLabel, act.getAssets().open(fileName));
+            GenericObject3D obj = new MokiatWavefront(idLabel, act.getAssets().open(fileName));
             object3dList.put(idLabel, obj);
-            Log.v(getClass().getSimpleName(), "Object3D added on hash");
+            Log.v(getClass().getSimpleName(), "GenericObject3D added on hash");
         } catch (Exception error) {
             Log.e(getClass().getSimpleName(), "Can't create a 3d object" + error.getMessage());
         }
@@ -52,7 +56,7 @@ public class GameResources {
         }
     }
 
-    public Object3D get3DModel(String idLabel) {
+    public GenericObject3D get3DModel(String idLabel) {
         return object3dList.get(idLabel);
     }
 

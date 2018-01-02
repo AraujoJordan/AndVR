@@ -8,7 +8,8 @@ import araujo.jordan.andvr.engine.draw.Color;
 import araujo.jordan.andvr.engine.entity.components.Component;
 import araujo.jordan.andvr.engine.entity.components.Transformation;
 import araujo.jordan.andvr.engine.math.Vector3D;
-import araujo.jordan.andvr.engine.resources.Object3D;
+import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
+import araujo.jordan.andvr.engine.resources.object3D.ManualWavefront;
 
 /**
  * Created by arauj on 05/03/2017.
@@ -18,7 +19,7 @@ public class Model3D extends Component {
 
     private final float width, height, depth;
     private final Vector3D centerOfModel;
-    private final Object3D obj3D;
+    private final GenericObject3D obj3D;
 
     private ModelDrawVR shape;
     private int textureID;
@@ -32,9 +33,9 @@ public class Model3D extends Component {
 
         obj3D = engine.resouces.get3DModel(resourceLabel);
 
-        this.width = obj3D.getWidth();
-        this.height = obj3D.getHeight();
-        this.depth = obj3D.getDepth();
+        this.width = obj3D.width;
+        this.height = obj3D.height;
+        this.depth = obj3D.depth;
         this.centerOfModel = obj3D.center;
         this.engine = engine;
     }
@@ -45,12 +46,14 @@ public class Model3D extends Component {
 
         obj3D = engine.resouces.get3DModel(resourceLabel);
 
-        if (obj3D == null)
-            Log.e(getClass().getSimpleName(), "Object not loaded");
+        if (obj3D == null) {
+            Log.e(getClass().getSimpleName(), "Object not found for given label");
+            throw new ExceptionInInitializerError("Object not found for given label");
+        }
 
-        this.width = obj3D.getWidth();
-        this.height = obj3D.getHeight();
-        this.depth = obj3D.getDepth();
+        this.width = obj3D.width;
+        this.height = obj3D.height;
+        this.depth = obj3D.depth;
         this.centerOfModel = obj3D.center;
         this.engine = engine;
         this.color = color;
@@ -63,9 +66,9 @@ public class Model3D extends Component {
         obj3D = engine.resouces.get3DModel(resourceLabel);
         textureID = engine.resouces.getTextureID(textureLabel);
 
-        this.width = obj3D.getWidth();
-        this.height = obj3D.getHeight();
-        this.depth = obj3D.getDepth();
+        this.width = obj3D.width;
+        this.height = obj3D.height;
+        this.depth = obj3D.depth;
         this.centerOfModel = obj3D.center;
         this.engine = engine;
     }
@@ -78,9 +81,9 @@ public class Model3D extends Component {
         obj3D = engine.resouces.get3DModel(resourceLabel);
         textureID = engine.resouces.getTextureID(textureLabel);
 
-        this.width = obj3D.getWidth();
-        this.height = obj3D.getHeight();
-        this.depth = obj3D.getDepth();
+        this.width = obj3D.width;
+        this.height = obj3D.height;
+        this.depth = obj3D.depth;
         this.centerOfModel = obj3D.center;
         this.engine = engine;
         this.color = color;
@@ -115,7 +118,7 @@ public class Model3D extends Component {
         if (shape != null)
             return;
 
-        shape = new ModelDrawVR(obj3D, textureID, engine, parentEntity, color);
+        shape = new ModelDrawVR(resourceLabel, obj3D, textureID, engine, parentEntity, color);
     }
 
     public void setColor(Color color) {

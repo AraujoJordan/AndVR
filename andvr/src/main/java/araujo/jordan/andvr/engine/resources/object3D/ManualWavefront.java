@@ -1,4 +1,4 @@
-package araujo.jordan.andvr.engine.resources;
+package araujo.jordan.andvr.engine.resources.object3D;
 
 import android.util.Log;
 
@@ -15,16 +15,10 @@ import araujo.jordan.andvr.engine.utils.BufferFactory;
  * Created by jordan on 14/12/17.
  */
 
-public class Object3D {
-    public final Vector3D center;
-    public  final int textureVTSize;
+public class ManualWavefront extends GenericObject3D {
 
-    public BufferFactory vertBuffer, normalBuffer, textureBuffer;
-    public int vertSize = 0;
-
-    public float width, height, depth;
-
-    public Object3D(InputStream inputStream) throws IOException {
+    public ManualWavefront(String id, InputStream inputStream) throws IOException {
+        super(id,inputStream);
 
         Log.v(getClass().getSimpleName(),"Loading object 3D");
 
@@ -136,6 +130,8 @@ public class Object3D {
                         normFloats.add(v.xyz[0]);
                         normFloats.add(v.xyz[1]);
                         normFloats.add(v.xyz[2]);
+
+                        Log.v("XYZ","x "+v.xyz[0]+" "+v.xyz[1]+" "+v.xyz[2]);
                     } else {
                         String[] faceValues = tokens[i + 1].split("/");
                         int index = Integer.parseInt(faceValues[0]);
@@ -154,6 +150,8 @@ public class Object3D {
                         normFloats.add(v.xyz[0]);
                         normFloats.add(v.xyz[1]);
                         normFloats.add(v.xyz[2]);
+
+                        Log.v("XYZ","x "+v.xyz[0]+" "+v.xyz[1]+" "+v.xyz[2]);
                     }
                 }
             }
@@ -175,10 +173,9 @@ public class Object3D {
         depth = maxDepth - minDepth;
 
         center = new Vector3D((maxWidth - minWidth) / 2, (maxHeight - minHeight) / 2, (maxDepth - minDepth) / 2);
-        Log.v(getClass().getSimpleName(),"Loading complete");
+        Log.v(getClass().getSimpleName(),"vertSize: "+vertSize);
+        Log.v(getClass().getSimpleName(),"textureVTSize: "+textureVTSize);
     }
-
-
 
     public float getWidth() {
         return width;

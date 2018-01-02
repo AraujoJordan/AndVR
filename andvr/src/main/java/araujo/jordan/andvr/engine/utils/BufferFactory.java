@@ -26,6 +26,7 @@ public class BufferFactory {
         for (int i = 0; i < data.size(); i++)
             vertexData[i] = data.get(i);
 
+
         ByteBuffer bbVertices = ByteBuffer.allocateDirect(vertexData.length * 4);
         bbVertices.order(ByteOrder.nativeOrder());
         floatBuffer = bbVertices.asFloatBuffer();
