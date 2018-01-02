@@ -1,6 +1,7 @@
 package araujo.jordan.andvr.engine.entity.components.model3d;
 
 import android.opengl.GLES30;
+import android.opengl.GLES32;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -18,6 +19,7 @@ import araujo.jordan.andvr.engine.draw.Color;
 import araujo.jordan.andvr.engine.entity.Entity;
 import araujo.jordan.andvr.engine.renderer.GLUtils;
 import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
+import araujo.jordan.andvr.engine.texture.TextureHelper;
 import araujo.jordan.andvr.engine.utils.BufferFactory;
 
 /**
@@ -31,7 +33,7 @@ public class ModelDrawVR implements Draw {
     private final FloatBuffer vertexBuffer;
     private final FloatBuffer normalBuffer;
     private final FloatBuffer colorBuffer;
-    private FloatBuffer textureBuffer = null;
+    private final FloatBuffer uvwBuffer;
 
     private final int mProgram;
     private final int modelPositionParam;
@@ -41,13 +43,12 @@ public class ModelDrawVR implements Draw {
     private final int modelModelViewParam;
     private final int modelModelViewProjectionParam;
     private final int modelLightPosParam;
-    private final int textureID;
+    private final int modelTexCoordinateParam;
+    private final int modelTexUniformParam;
 
     private final int mTextureDataHandle;
-    private final int mTextureUniformHandle;
-    private final int mTextureCoordinateHandle;
 
-    private float color[] = {0.1f, 1.0f, 0.1f, 1.0f}; //default color
+    private float color[] = {1f, 1f, 1f, 0.5f}; //default color
     private int vertexCount;
 
     private Entity entity;
@@ -58,13 +59,11 @@ public class ModelDrawVR implements Draw {
      */
     public ModelDrawVR(String objectID, GenericObject3D obj3D, int textureID, VREngine engine, Entity entity, Color colorObj) {
         this.entity = entity;
-        this.textureID = textureID;
         this.engine = engine;
 
         //COLOR
-        if (colorObj != null) {
-            color = colorObj.getFloatRGBA();
-        }
+//        if (colorObj != null) //If color is defined, use it. If not, get the default color
+//            color = colorObj.getFloatRGBA();
 
         Log.d("Color", Arrays.toString(color));
         float[] colorCoords = new float[(obj3D.vertSize / 3) * 4];
@@ -76,6 +75,8 @@ public class ModelDrawVR implements Draw {
             colorCoords[index++] = color[3];
         }
 
+        mTextureDataHandle = TextureHelper.loadTexture(engine.vrAct, R.drawable.cube);
+
         vertexCount = obj3D.vertSize / COORDS_PER_VERTEX;
 
 //        if(BufferCache.getInstance().bufferHash.containsKey(obj3D.id)) {
@@ -85,51 +86,42 @@ public class ModelDrawVR implements Draw {
 //        normalBuffer = new BufferFactory(createNormals()).getFloatBuffer();
         normalBuffer = obj3D.normalBuffer.getFloatBuffer();
         colorBuffer = new BufferFactory(colorCoords).getFloatBuffer();
-
-        if (obj3D.textureVTSize > 0) {
-            textureBuffer = obj3D.textureBuffer.getFloatBuffer();
-        }
+        uvwBuffer = obj3D.uvwBuffer.getFloatBuffer();
 
         int vertexShader;
         int passthroughShader;
 
         // prepare shaders and OpenGL program
-        if (obj3D.textureVTSize == 0) {
-            vertexShader = loadGLShader(GLES30.GL_VERTEX_SHADER, R.raw.vertex_shader);
-            passthroughShader = loadGLShader(GLES30.GL_FRAGMENT_SHADER, R.raw.fragment_shader);
+        vertexShader = loadGLShader(GLES32.GL_VERTEX_SHADER, R.raw.texture_vertex_shader);
+        passthroughShader = loadGLShader(GLES32.GL_FRAGMENT_SHADER, R.raw.texture_fragment_shader);
 
-        } else {
-            vertexShader = loadGLShader(GLES30.GL_VERTEX_SHADER, R.raw.texture_vertex_shader);
-            passthroughShader = loadGLShader(GLES30.GL_FRAGMENT_SHADER, R.raw.texture_fragment_shader);
-        }
+        mProgram = GLES32.glCreateProgram();
+        GLES32.glAttachShader(mProgram, vertexShader);
+        GLES32.glAttachShader(mProgram, passthroughShader);
+        GLES32.glLinkProgram(mProgram);
+        GLES32.glUseProgram(mProgram);
 
-        mProgram = GLES30.glCreateProgram();
-        GLES30.glAttachShader(mProgram, vertexShader);
-        GLES30.glAttachShader(mProgram, passthroughShader);
-        GLES30.glLinkProgram(mProgram);
-        GLES30.glUseProgram(mProgram);
+        modelPositionParam = GLES32.glGetAttribLocation(mProgram, "a_Position");
+        modelNormalParam = GLES32.glGetAttribLocation(mProgram, "a_Normal");
+        modelColorParam = GLES32.glGetAttribLocation(mProgram, "a_Color");
+        modelTexCoordinateParam = GLES32.glGetAttribLocation(mProgram, "a_TexCoordinate");
+        modelTexUniformParam = GLES32.glGetUniformLocation(mProgram, "u_Texture");
 
-        modelPositionParam = GLES30.glGetAttribLocation(mProgram, "a_Position");
-        modelNormalParam = GLES30.glGetAttribLocation(mProgram, "a_Normal");
-        modelColorParam = GLES30.glGetAttribLocation(mProgram, "a_Color");
+        modelModelParam = GLES32.glGetUniformLocation(mProgram, "u_Model");
+        modelModelViewParam = GLES32.glGetUniformLocation(mProgram, "u_MVMatrix");
+        modelModelViewProjectionParam = GLES32.glGetUniformLocation(mProgram, "u_MVP");
+        modelLightPosParam = GLES32.glGetUniformLocation(mProgram, "u_LightPos");
 
-        modelModelParam = GLES30.glGetUniformLocation(mProgram, "u_Model");
-        modelModelViewParam = GLES30.glGetUniformLocation(mProgram, "u_MVMatrix");
-        modelModelViewProjectionParam = GLES30.glGetUniformLocation(mProgram, "u_MVP");
-        modelLightPosParam = GLES30.glGetUniformLocation(mProgram, "u_LightPos");
+        GLES32.glActiveTexture(GLES32.GL_TEXTURE0);
+        GLES32.glGenerateMipmap(GLES32.GL_TEXTURE_2D);
+        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
 
-        if (obj3D.textureVTSize == 0) {
-            mTextureDataHandle = textureID;
-            mTextureUniformHandle = GLES30.glGetUniformLocation(mProgram, "u_Texture");
-            mTextureCoordinateHandle = GLES30.glGetAttribLocation(mProgram, "a_TexCoordinate");
-            GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
-            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mTextureDataHandle);
-            GLES30.glUniform1i(mTextureUniformHandle, 0);
-        } else {
-            mTextureDataHandle = -1;
-            mTextureUniformHandle = -1;
-            mTextureCoordinateHandle = -1;
-        }
+        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR_MIPMAP_LINEAR);
+        
+        GLES32.glUniform1i(modelTexUniformParam, 0);
+
     }
 
     /**
@@ -141,52 +133,54 @@ public class ModelDrawVR implements Draw {
         float[] modelViewProjMatrix = new float[16];
         Matrix.multiplyMM(modelViewProjMatrix, 0, VrActivity.mProjectionViewMatrix, 0, entity.getTransformation().modelMatrix, 0);
 
-        GLES30.glUseProgram(mProgram);
+        GLES32.glUseProgram(mProgram);
 
-        GLES30.glUniform3fv(modelLightPosParam, 1, VrActivity.mLightEyeMatrix, 0);
+        GLES32.glUniform3fv(modelLightPosParam, 1, VrActivity.mLightEyeMatrix, 0);
 
         // Set the Model in the shader, used to calculate lighting
-        GLES30.glUniformMatrix4fv(modelModelParam, 1, false, entity.getTransformation().modelMatrix, 0);
+        GLES32.glUniformMatrix4fv(modelModelParam, 1, false, entity.getTransformation().modelMatrix, 0);
 
         float[] modelView = new float[16];
         Matrix.multiplyMM(modelView, 0, VrActivity.mViewMatrix, 0, entity.getTransformation().modelMatrix, 0);
 
         // Set the ModelView in the shader, used to calculate lighting
-        GLES30.glUniformMatrix4fv(modelModelViewParam, 1, false, modelView, 0);
+        GLES32.glUniformMatrix4fv(modelModelViewParam, 1, false, modelView, 0);
 
         // Set the position of the model
-        GLES30.glVertexAttribPointer(
-                modelPositionParam, COORDS_PER_VERTEX, GLES30.GL_FLOAT, false, 0, vertexBuffer);
+        GLES32.glVertexAttribPointer(
+                modelPositionParam, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertexBuffer);
 
         // Set the ModelViewProjection matrix in the shader.
-        GLES30.glUniformMatrix4fv(modelModelViewProjectionParam, 1, false, modelViewProjMatrix, 0);
+        GLES32.glUniformMatrix4fv(modelModelViewProjectionParam, 1, false, modelViewProjMatrix, 0);
 
         // Set the normal positions of the model, again for shading
-        GLES30.glVertexAttribPointer(modelNormalParam, 3, GLES30.GL_FLOAT, false, 0, normalBuffer);
-        GLES30.glVertexAttribPointer(modelColorParam, 4, GLES30.GL_FLOAT, false, 0, colorBuffer);
+        GLES32.glVertexAttribPointer(modelNormalParam, 3, GLES32.GL_FLOAT, false, 0, normalBuffer);
 
-        // Pass in the texture coordinate information
-        if (textureBuffer != null) {
-            GLES30.glVertexAttribPointer(mTextureCoordinateHandle, 2, GLES30.GL_FLOAT, false, 0, textureBuffer);
-            GLES30.glEnableVertexAttribArray(mTextureCoordinateHandle);
-            GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
-            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureID);
-            GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT);
-            GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT);
+        // Set the colors of the model
+        GLES32.glVertexAttribPointer(modelColorParam, 4, GLES32.GL_FLOAT, false, 0, colorBuffer);
 
-        }
+        //Activate Texture
+        GLES32.glActiveTexture(GLES32.GL_TEXTURE0);
+
+        // Set UVW of the model
+        GLES32.glVertexAttribPointer(modelTexCoordinateParam, 2, GLES32.GL_FLOAT, false, 0, uvwBuffer);
 
         // Enable vertex arrays
-        GLES30.glEnableVertexAttribArray(modelPositionParam);
-        GLES30.glEnableVertexAttribArray(modelNormalParam);
-        GLES30.glEnableVertexAttribArray(modelColorParam);
+        GLES32.glEnableVertexAttribArray(modelPositionParam);
+        GLES32.glEnableVertexAttribArray(modelNormalParam);
+        GLES32.glEnableVertexAttribArray(modelColorParam);
+        GLES32.glEnableVertexAttribArray(modelTexCoordinateParam);
 
-        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vertexCount);
+
+
+        GLES32.glDrawArrays(GLES32.GL_TRIANGLES, 0, vertexCount);
+
 
         // Disable vertex arrays
-        GLES30.glDisableVertexAttribArray(modelPositionParam);
-        GLES30.glDisableVertexAttribArray(modelNormalParam);
-        GLES30.glDisableVertexAttribArray(modelColorParam);
+        GLES32.glDisableVertexAttribArray(modelPositionParam);
+        GLES32.glDisableVertexAttribArray(modelNormalParam);
+        GLES32.glDisableVertexAttribArray(modelColorParam);
+        GLES32.glDisableVertexAttribArray(modelTexCoordinateParam);
 
         GLUtils.checkGlError("Drawing model");
     }
@@ -221,18 +215,18 @@ public class ModelDrawVR implements Draw {
             e.printStackTrace();
         }
 
-        int shader = GLES30.glCreateShader(type);
-        GLES30.glShaderSource(shader, code);
-        GLES30.glCompileShader(shader);
+        int shader = GLES32.glCreateShader(type);
+        GLES32.glShaderSource(shader, code);
+        GLES32.glCompileShader(shader);
 
         // Get the compilation status.
         final int[] compileStatus = new int[1];
-        GLES30.glGetShaderiv(shader, GLES30.GL_COMPILE_STATUS, compileStatus, 0);
+        GLES32.glGetShaderiv(shader, GLES32.GL_COMPILE_STATUS, compileStatus, 0);
 
         // If the compilation failed, delete the shader.
         if (compileStatus[0] == 0) {
-            Log.e(getClass().getSimpleName(), "Error compiling shader: " + GLES30.glGetShaderInfoLog(shader));
-            GLES30.glDeleteShader(shader);
+            Log.e(getClass().getSimpleName(), "Error compiling shader: " + GLES32.glGetShaderInfoLog(shader));
+            GLES32.glDeleteShader(shader);
             shader = 0;
         }
 

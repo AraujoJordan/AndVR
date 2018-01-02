@@ -21,6 +21,7 @@ public abstract class GenericObject3D {
 
     public Vector3D center;
     public int textureVTSize;
+    public boolean hasTexture;
 
     public BufferFactory vertBuffer, normalBuffer, textureBuffer, uvwBuffer;
     public int vertSize = 0;

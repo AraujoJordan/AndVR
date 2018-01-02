@@ -1,6 +1,6 @@
 package araujo.jordan.andvr.engine;
 
-import android.opengl.GLES30;
+import android.opengl.GLES32;
 import android.opengl.Matrix;
 import android.os.Bundle;
 
@@ -64,7 +64,7 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
     public void onNewFrame(HeadTransform headTransform) {
 
         //Creation of a beautiful blue sky
-        GLES30.glClearColor(0.529411765f, 0.807843137f, 0.980392157f, 1.0f);
+        GLES32.glClearColor(0.529411765f, 0.807843137f, 0.980392157f, 1.0f);
 
         //Get the Camera Matrix
         camera = engine.getCamera().updateCamera(headTransform);
@@ -77,8 +77,8 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
     @Override
     public void onDrawEye(Eye eye) {
 
-        GLES30.glEnable(GLES30.GL_DEPTH_TEST);
-        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
+        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
 
         GLUtils.checkGlError("colorParam");
 
@@ -98,10 +98,10 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
         Matrix.multiplyMM(mProjectionViewMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
         //UPDATE THE MODELS WITH THE PROJECTIONVIEW MATRIX
-        GLES30.glFrontFace(GLES30.GL_CCW);
-        GLES30.glEnable(GLES30.GL_CULL_FACE);
-        GLES30.glCullFace(GLES30.GL_BACK);
-        GLES30.glEnable(GLES30.GL_DEPTH_TEST);
+        GLES32.glFrontFace(GLES32.GL_CCW);
+        GLES32.glEnable(GLES32.GL_CULL_FACE);
+        GLES32.glCullFace(GLES32.GL_BACK);
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
 
         //DRAW MODEL3D COMPONENTS
         engine.draw();

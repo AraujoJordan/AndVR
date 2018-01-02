@@ -34,7 +34,7 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         super.onCreate(savedInstanceState);
 
         resources = new GameResources();
-        resources.addOBJ(this, "porche", "porche.obj");
+        resources.addOBJ(this, "cube", "cube.obj");
 
         gameEngine = new VREngine(this, resources, this);
 
@@ -42,9 +42,9 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         camera.getTransformation().setTranslation(0, 0f, 0f);
         gameEngine.addCamera(camera);
 
-        Entity testCube = new Entity("testCube");
-        testCube.addComponent(new Transformation(0,0,-3f));
-        testCube.addComponent(new Model3D("porche", gameEngine,
+        Entity testCube = new Entity("cube");
+        testCube.addComponent(new Transformation(0,0,-2f));
+        testCube.addComponent(new Model3D("cube", gameEngine,
                 new Color(1f,0f,0f, 1f)));
         gameEngine.addEntity(testCube);
         birdsListForTrans.add(testCube);

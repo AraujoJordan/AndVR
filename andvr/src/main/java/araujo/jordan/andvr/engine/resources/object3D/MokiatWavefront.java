@@ -88,7 +88,6 @@ public class MokiatWavefront extends GenericObject3D {
         vertBuffer = new BufferFactory(vertexs);
         normalBuffer = new BufferFactory(normals);
         uvwBuffer = new BufferFactory(txtcoords);
-
         vertSize = vertexs.size();
     }
 
