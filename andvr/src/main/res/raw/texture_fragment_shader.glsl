@@ -7,6 +7,7 @@ varying vec3 v_Position;		// Interpolated position for this fragment.
 varying vec3 v_Normal;         	// Interpolated normal for this fragment.
 varying vec2 v_TexCoordinate;   // Interpolated texture coordinate per fragment.
 
+
 // The entry point for our fragment shader.
 void main()
 {
