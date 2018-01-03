@@ -1,6 +1,10 @@
 package araujo.jordan.andvrAppTest;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -28,13 +32,18 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
     private Timer timer;
 
     ArrayList<Entity> birdsListForTrans = new ArrayList<>();
+    private int permissionCheck;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         resources = new GameResources();
         resources.addOBJ(this, "cube", "cube.obj");
+        resources.addOBJ(this, "bird", "bird-flat.obj");
+        resources.addOBJ(this, "porche", "porche.obj");
 
         gameEngine = new VREngine(this, resources, this);
 
@@ -43,22 +52,22 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         gameEngine.addCamera(camera);
 
         Entity testCube = new Entity("cube");
-        testCube.addComponent(new Transformation(0,0,-2f));
-        testCube.addComponent(new Model3D("cube", gameEngine,
+        testCube.addComponent(new Transformation(0,0,-3f));
+        testCube.addComponent(new Model3D("porche", gameEngine,
                 new Color(1f,0f,0f, 1f)));
         gameEngine.addEntity(testCube);
         birdsListForTrans.add(testCube);
 
-//        birdsListForTrans = addBirds(1);
+//        birdsListForTrans = addObjects(15);
 
-//        timer = new Timer();
-//        timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                Log.e("GameActivity", "FPS: " + fps);
-//                fps = 0;
-//            }
-//        }, 1000, 1000);
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Log.e("GameActivity", "FPS: " + fps);
+                fps = 0;
+            }
+        }, 1000, 1000);
     }
 
     @Override
@@ -71,7 +80,7 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
 
     @Override
     public void gameFrame() {
-//        fps++;
+        fps++;
         increment++;
         Vector3D rot3D = birdsListForTrans.get(0).getTransformation().getRotation();
         rot3D.xyz[0] = increment;
@@ -83,14 +92,14 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         }
     }
 
-    public ArrayList<Entity> addBirds(int birds) {
+    public ArrayList<Entity> addObjects(int many) {
 
         ArrayList<Entity> birdsList = new ArrayList<>();
         Random rand = new Random();
         final int max = 10;
         final int min = -10;
 
-        for (int i = 0; i < birds; i++) {
+        for (int i = 0; i < many; i++) {
             Entity bird = new Entity("bird" + i);
             bird.addComponent(new Transformation(
                     rand.nextInt((max - min) + 1) + min,
@@ -106,7 +115,7 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
             float blue = rand.nextFloat();
             blue = (blue+0.5f)>1.0?1.0f:blue;
 
-            bird.addComponent(new Model3D("bird", gameEngine,
+            bird.addComponent(new Model3D("porche", gameEngine,
                     new Color(red,green,blue,
                             1f)));
             gameEngine.addEntity(bird);

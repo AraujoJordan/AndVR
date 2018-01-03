@@ -30,17 +30,17 @@ public class ModelDrawVR implements Draw {
     private static final int COORDS_PER_VERTEX = 3; // number of coordinates per vertex in this array
     private static final int POSITION_DATA_SIZE = 3;
     private static final int NORMAL_DATA_SIZE = 3;
-    private static final int COLOR_DATA_SIZE = 4;
+//    private static final int COLOR_DATA_SIZE = 4;
     private static final int TEXTURE_COORDINATE_DATA_SIZE = 2;
     private static final int BYTES_PER_FLOAT = 4;
 
 
-    private final int[] buffers;
+//    private final int[] buffers;
 
-//    FloatBuffer vertexBuffer;
-//    FloatBuffer normalBuffer;
-//    FloatBuffer colorBuffer;
-//    FloatBuffer textureCoordsBuffer;
+    FloatBuffer vertexBuffer;
+    FloatBuffer normalBuffer;
+    FloatBuffer colorBuffer;
+    FloatBuffer textureCoordsBuffer;
 
     private final int mProgram;
     private final int modelPositionParam;
@@ -85,10 +85,10 @@ public class ModelDrawVR implements Draw {
 
         vertexCount = obj3D.vertSize / COORDS_PER_VERTEX;
 
-        FloatBuffer vertexBuffer;
-        FloatBuffer normalBuffer;
-//        FloatBuffer colorBuffer;
-        FloatBuffer textureCoordsBuffer;
+//        FloatBuffer vertexBuffer;
+//        FloatBuffer normalBuffer;
+////        FloatBuffer colorBuffer;
+//        FloatBuffer textureCoordsBuffer;
 
         vertexBuffer = obj3D.vertBuffer.getFloatBuffer();
 //        normalBuffer = new BufferFactory(createNormals()).getFloatBuffer();
@@ -122,40 +122,40 @@ public class ModelDrawVR implements Draw {
         modelLightPosParam = GLES32.glGetUniformLocation(mProgram, "u_LightPos");
 
         //TEXTURES
-        GLES32.glActiveTexture(GLES32.GL_TEXTURE0);
-        GLES32.glGenerateMipmap(GLES32.GL_TEXTURE_2D);
-        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
-        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
-
-        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
-        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR_MIPMAP_LINEAR);
-
-        GLES32.glUniform1i(modelTexUniformParam, 0);
+//        GLES32.glActiveTexture(GLES32.GL_TEXTURE0);
+//        GLES32.glGenerateMipmap(GLES32.GL_TEXTURE_2D);
+//        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
+//        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
+//
+//        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
+//        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR_MIPMAP_LINEAR);
+//
+//        GLES32.glUniform1i(modelTexUniformParam, 0);
 
 //        //INIT VBO
-        buffers = new int[3];
-        GLES32.glGenBuffers(3, buffers, 0);
-
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[0]);
-        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, vertexBuffer.capacity() * BYTES_PER_FLOAT, vertexBuffer, GLES32.GL_STATIC_DRAW);
-
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[1]);
-        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, normalBuffer.capacity() * BYTES_PER_FLOAT, normalBuffer, GLES32.GL_STATIC_DRAW);
-
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[2]);
-        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, textureCoordsBuffer.capacity() * BYTES_PER_FLOAT, textureCoordsBuffer,
-                GLES32.GL_STATIC_DRAW);
+//        buffers = new int[3];
+//        GLES32.glGenBuffers(3, buffers, 0);
+//
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[0]);
+//        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, vertexBuffer.capacity() * BYTES_PER_FLOAT, vertexBuffer, GLES32.GL_STATIC_DRAW);
+//
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[1]);
+//        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, normalBuffer.capacity() * BYTES_PER_FLOAT, normalBuffer, GLES32.GL_STATIC_DRAW);
+//
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[2]);
+//        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, textureCoordsBuffer.capacity() * BYTES_PER_FLOAT, textureCoordsBuffer,
+//                GLES32.GL_STATIC_DRAW);
 
 //        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[4]);
 //        GLES32.glBufferData(GLES32.GL_ARRAY_BUFFER, colorBuffer.capacity() * BYTES_PER_FLOAT, colorBuffer,
 //                GLES32.GL_STATIC_DRAW);
 
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, 0);
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, 0);
 
         //CLEAR MEMORY
-        vertexBuffer.clear();
-        normalBuffer.clear();
-        textureCoordsBuffer.clear();
+//        vertexBuffer.clear();
+//        normalBuffer.clear();
+//        textureCoordsBuffer.clear();
 //        colorBuffer.limit(0);
     }
 
@@ -185,39 +185,39 @@ public class ModelDrawVR implements Draw {
         //Vertex Array Object (VAO)
 
         // Set the position of theVertex Buffer Object model
-//        GLES32.glVertexAttribPointer(
-//                modelPositionParam, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertexBuffer);
-//
-//        // Set the ModelViewProjection matrix in the shader.
-//        GLES32.glUniformMatrix4fv(modelModelViewProjectionParam, 1, false, modelViewProjMatrix, 0);
-//
-//        // Set the normal positions of the model, again for shading
-//        GLES32.glVertexAttribPointer(modelNormalParam, 3, GLES32.GL_FLOAT, false, 0, normalBuffer);
-//
-//        // Set the colors of the model
+        GLES32.glVertexAttribPointer(
+                modelPositionParam, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertexBuffer);
+
+        // Set the ModelViewProjection matrix in the shader.
+        GLES32.glUniformMatrix4fv(modelModelViewProjectionParam, 1, false, modelViewProjMatrix, 0);
+
+        // Set the normal positions of the model, again for shading
+        GLES32.glVertexAttribPointer(modelNormalParam, 3, GLES32.GL_FLOAT, false, 0, normalBuffer);
+
+        // Set the colors of the model
 //        GLES32.glVertexAttribPointer(modelColorParam, 4, GLES32.GL_FLOAT, false, 0, colorBuffer);
-//
-//        // Set UVW of the model
-//        GLES32.glVertexAttribPointer(modelTexCoordinateParam, 2, GLES32.GL_FLOAT, false, 0, textureCoordsBuffer);
+
+        // Set UVW of the model
+        GLES32.glVertexAttribPointer(modelTexCoordinateParam, 2, GLES32.GL_FLOAT, false, 0, textureCoordsBuffer);
 
         // Vertex Buffer Object (VBO)
         // Pass in the position information
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[0] );
-        GLES32.glEnableVertexAttribArray(modelPositionParam);
-        GLES32.glVertexAttribPointer(modelPositionParam, POSITION_DATA_SIZE, GLES32.GL_FLOAT, false, 0, 0);
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[0] );
+//        GLES32.glEnableVertexAttribArray(modelPositionParam);
+//        GLES32.glVertexAttribPointer(modelPositionParam, POSITION_DATA_SIZE, GLES32.GL_FLOAT, false, 0, 0);
+//
+//        // Pass in the normal information
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[1]);
+//        GLES32.glEnableVertexAttribArray(modelNormalParam);
+//        GLES32.glVertexAttribPointer(modelNormalParam, NORMAL_DATA_SIZE, GLES32.GL_FLOAT, false, 0, 0);
+//
+//        // Pass in the texture information
+//        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[2]);
+//        GLES32.glEnableVertexAttribArray(modelTexCoordinateParam);
+//        GLES32.glVertexAttribPointer(modelTexCoordinateParam, TEXTURE_COORDINATE_DATA_SIZE, GLES32.GL_FLOAT, false,
+//                0, 0);
 
-        // Pass in the normal information
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[1]);
-        GLES32.glEnableVertexAttribArray(modelNormalParam);
-        GLES32.glVertexAttribPointer(modelNormalParam, NORMAL_DATA_SIZE, GLES32.GL_FLOAT, false, 0, 0);
-
-        // Pass in the texture information
-        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[2]);
-        GLES32.glEnableVertexAttribArray(modelTexCoordinateParam);
-        GLES32.glVertexAttribPointer(modelTexCoordinateParam, TEXTURE_COORDINATE_DATA_SIZE, GLES32.GL_FLOAT, false,
-                0, 0);
-
-//        // Pass in the color information
+        // Pass in the color information
 //        GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[3]);
 //        GLES32.glEnableVertexAttribArray(modelColorParam);
 //        GLES32.glVertexAttribPointer(modelColorParam, COLOR_DATA_SIZE, GLES32.GL_FLOAT, false,
@@ -226,8 +226,8 @@ public class ModelDrawVR implements Draw {
         // Clear the currently bound buffer (so future OpenGL calls do not use this buffer).
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, 0);
 
-        //        //Activate Texture
-        GLES32.glActiveTexture(GLES32.GL_TEXTURE0);
+        //Activate Texture
+//        GLES32.glActiveTexture(GLES32.GL_TEXTURE0);
 
         // Enable vertex arrays
 //        GLES32.glEnableVertexAttribArray(modelPositionParam);

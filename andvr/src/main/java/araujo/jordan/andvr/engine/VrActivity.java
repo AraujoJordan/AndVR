@@ -14,7 +14,6 @@ import com.google.vr.sdk.base.Viewport;
 import javax.microedition.khronos.egl.EGLConfig;
 
 import araujo.jordan.andvr.R;
-import araujo.jordan.andvr.engine.entity.Entity;
 import araujo.jordan.andvr.engine.renderer.GLUtils;
 
 /**
@@ -41,7 +40,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
         setContentView(R.layout.vr);
 
         gvrView = findViewById(R.id.gvr_view);
-
 
         gvrView.setRenderer(this);
         gvrView.setTransitionViewEnabled(true);
