@@ -14,7 +14,6 @@ import araujo.jordan.andvr.R;
 import araujo.jordan.andvr.engine.VREngine;
 import araujo.jordan.andvr.engine.VrActivity;
 import araujo.jordan.andvr.engine.entity.Entity;
-import araujo.jordan.andvr.engine.entity.components.Texture;
 import araujo.jordan.andvr.engine.renderer.GLUtils;
 import araujo.jordan.andvr.engine.resources.BufferCache;
 import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
@@ -71,8 +70,8 @@ public class ModelDrawVR implements Draw {
         int passthroughShader;
 
         // prepare shaders and OpenGL program
-        vertexShader = loadGLShader(GLES32.GL_VERTEX_SHADER, R.raw.texture_vertex_shader);
-        passthroughShader = loadGLShader(GLES32.GL_FRAGMENT_SHADER, R.raw.texture_fragment_shader);
+        vertexShader = loadGLShader(GLES32.GL_VERTEX_SHADER, R.raw.mvertex_shader);
+        passthroughShader = loadGLShader(GLES32.GL_FRAGMENT_SHADER, R.raw.mfragment_shader);
 
         mProgram = GLES32.glCreateProgram();
         GLES32.glAttachShader(mProgram, vertexShader);
@@ -88,7 +87,7 @@ public class ModelDrawVR implements Draw {
 
         modelModelParam = GLES32.glGetUniformLocation(mProgram, "u_Model");
         modelModelViewParam = GLES32.glGetUniformLocation(mProgram, "u_MVMatrix");
-        modelModelViewProjectionParam = GLES32.glGetUniformLocation(mProgram, "u_MVP");
+        modelModelViewProjectionParam = GLES32.glGetUniformLocation(mProgram, "u_MVPMatrix");
         mLightPosHandle = GLES32.glGetUniformLocation(mProgram, "u_LightPos");
 
         //CACHE
@@ -96,17 +95,7 @@ public class ModelDrawVR implements Draw {
 
         //TEXTURES
         if (parentEntity.getTexture() != null) {
-            Texture texture = parentEntity.getTexture();
-
-            mTextureDataHandle = texture.initTexture();
-
-            GLES32.glGenerateMipmap(GLES32.GL_TEXTURE_2D);
-
-            GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
-//            GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
-//
-//            GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, mTextureDataHandle);
-//            GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR_MIPMAP_LINEAR);
+            mTextureDataHandle = parentEntity.getTexture().initTexture();
         }
 
         //INIT VBO

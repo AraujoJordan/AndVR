@@ -34,10 +34,10 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         super.onCreate(savedInstanceState);
 
         resources = new GameResources();
-        resources.addOBJ(this, "cube", "cube.obj");
-        resources.addOBJ(this, "bird", "bird-flat.obj");
-        resources.addOBJ(this, "porche", "porche.obj");
-        resources.addTexture("porcheTexture", R.drawable.porche);
+        resources.addOBJ(this, "cube", "duck.obj");
+//        resources.addOBJ(this, "bird", "bird-flat.obj");
+//        resources.addOBJ(this, "porche", "porche.obj");
+        resources.addTexture("cube", R.drawable.ducktexture);
 
         gameEngine = new VREngine(this, resources, this);
 
@@ -45,11 +45,11 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         camera.getTransformation().setTranslation(0, 0f, 0f);
         gameEngine.addCamera(camera);
 
-        Entity superCar = new Entity("supercar");
+        Entity superCar = new Entity("cube");
         superCar.addComponent(new Transformation(0, 0, -4f));
-        superCar.addComponent(new Model3D("porche", gameEngine,
+        superCar.addComponent(new Model3D("cube", gameEngine,
                 new Color(1f, 0f, 0f, 1f)));
-        superCar.addComponent(new Texture(gameEngine, "porcheTexture"));
+        superCar.addComponent(new Texture(gameEngine, "cube"));
         gameEngine.addEntity(superCar);
         entitiesListForTrans.add(superCar);
 

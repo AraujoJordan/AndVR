@@ -2,6 +2,7 @@ package araujo.jordan.andvr.engine.entity.components;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLES32;
 import android.util.Log;
 
 import araujo.jordan.andvr.engine.VREngine;
@@ -34,8 +35,13 @@ public class Texture extends Component {
     }
 
     public int initTexture() {
-
         textureID = TextureHelper.loadTexture(bitmap);
+        GLES32.glGenerateMipmap(GLES32.GL_TEXTURE_2D);
+        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, textureID);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
+        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, textureID);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR_MIPMAP_LINEAR);
+
         BufferCache.getInstance().textureBuffer.put(resourceLabel, textureID);
         Log.v("Texture", "Texture " + resourceLabel + " inited with ID " + textureID);
 

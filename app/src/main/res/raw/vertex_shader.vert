@@ -1,38 +1,29 @@
-uniform mat4 u_Model;
-uniform mat4 u_MVP;
-uniform mat4 u_MVMatrix;
-uniform vec3 u_LightPos;
+//VERTEX SHADER
 
-attribute vec4 a_Position;
-attribute vec4 a_Color;
-attribute vec3 a_Normal;
+uniform mat4 u_MVPMatrix;		// A constant representing the combined model/view/projection matrix.
+uniform mat4 u_MVMatrix;		// A constant representing the combined model/view matrix.
 
-varying vec4 v_Color;
+attribute vec4 a_Position;		// Per-vertex position information we will pass in.
+attribute vec3 a_Normal;		// Per-vertex normal information we will pass in.
+attribute vec2 a_TexCoordinate; // Per-vertex texture coordinate information we will pass in.
 
+varying vec3 v_Position;		// This will be passed into the fragment shader.
+varying vec3 v_Normal;			// This will be passed into the fragment shader.
+varying vec2 v_TexCoordinate;   // This will be passed into the fragment shader.
+
+// The entry point for our vertex shader.
 void main()
-    {
-        vec3 lightColor = vec3(0.5,0.5,0.5);
+{
+	// Transform the vertex into eye space.
+	v_Position = vec3(u_MVMatrix * a_Position);
 
+	// Pass through the texture coordinate.
+	v_TexCoordinate = a_TexCoordinate;
 
-        // Ambient
-        vec4 ambientColor = vec4(0.15,0.15,0.15,1.0);
+	// Transform the normal's orientation into eye space.
+    v_Normal = vec3(u_MVMatrix * vec4(a_Normal, 0.0));
 
-        // Difuse
-        vec3 norm = normalize(a_Normal);
-        vec3 FragPos = vec3(u_MVMatrix * a_Position);
-        vec3 lightDir = normalize(u_LightPos - FragPos);
-        // float distance = length(u_LightPos - FragPos);
-        float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = diff * lightColor;
-
-        // Specular
-        float specularStrength = 1.0;
-        vec3 viewDir = normalize(-FragPos); // The viewer is at (0,0,0) so viewDir is (0,0,0) - Position => -Position
-        vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-        vec3 specular = specularStrength * spec * lightColor;
-
-        v_Color = (ambientColor + vec4(diffuse,1.0) + vec4(specular,1.0)) * a_Color;
-
-        gl_Position = u_MVP * a_Position;
-    }
+	// gl_Position is a special variable used to store the final position.
+	// Multiply the vertex by the matrix to get the final point in normalized screen coordinates.
+	gl_Position = u_MVPMatrix * a_Position;
+}
