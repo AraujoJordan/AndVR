@@ -1,6 +1,7 @@
 package araujo.jordan.andvr.engine;
 
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -15,13 +16,12 @@ import araujo.jordan.andvr.engine.resources.GameResources;
  */
 public class VREngine {
 
-    private ArrayList<Entity> entities;
     public GameResources resouces;
     public GameUpdates updates;
     public Camera camera;
-
     public VrActivity vrAct;
     public boolean runningEngine;
+    private ArrayList<Entity> entities;
 
 //    private ArrayList<List<Entity>> taskEntities = new ArrayList<>();
 //    private final int CPU_THREADS = Runtime.getRuntime().availableProcessors();
@@ -91,10 +91,12 @@ public class VREngine {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
-    public void initGeometry() {
-        for (Entity entity : entities)
+    public void loadIntoOpenGL() {
+        Log.v("VREngine", "loadIntoOpenGL()");
+        for (Entity entity : entities) {
             if (entity.getModel3D() != null)
                 entity.getModel3D().initTriangles();
+        }
     }
 
     public void addEntity(Entity entity) {

@@ -12,7 +12,7 @@ varying vec2 v_TexCoordinate;   // Interpolated texture coordinate per fragment.
 void main()
 {
 	// Will be used for attenuation.
-    float distance = length(u_LightPos - v_Position);
+    float distance = length(u_LightPos - v_Position)+0.0001;
 
 	// Get a lighting direction vector from the light to the vertex.
     vec3 lightVector = normalize(u_LightPos - v_Position);
@@ -24,7 +24,7 @@ void main()
 	// Add attenuation.
     diffuse = diffuse * (1.0 / distance);
 
-    // Add ambient lighting
+    // Add ambient lighting     DEFAULT: 0.2
     diffuse = diffuse + 0.2;
 
 	// Multiply the color by the diffuse illumination level and texture value to get final output color.

@@ -8,9 +8,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
-import araujo.jordan.andvr.engine.resources.object3D.ManualWavefront;
 import araujo.jordan.andvr.engine.resources.object3D.MokiatWavefront;
-import araujo.jordan.andvr.engine.texture.TextureHelper;
 
 /**
  * Created by arauj on 24/02/2017.
@@ -33,7 +31,6 @@ public class GameResources {
         if (isLoaded)
             throw new RuntimeException("Can't create a 3d object now, create before");
         try {
-
             if (!Arrays.asList(act.getResources().getAssets().list("")).contains(fileName))
                 throw new IOException("File " + fileName + " in assets folder doesn't exist. Check if the assets folder and the file is there");
 
@@ -46,11 +43,11 @@ public class GameResources {
         }
     }
 
-    public void loadTexture(Activity act, String label, int res) {
+    public void addTexture(String label, int res) {
         if (isLoaded)
             throw new RuntimeException("Can't create a texture object now, create before");
         try {
-            textureList.put(label, TextureHelper.loadTexture(act, res));
+            textureList.put(label, res);
         } catch (Exception error) {
             Log.e(getClass().getSimpleName(), "Can't create a texture object" + error.getMessage());
         }
@@ -60,13 +57,12 @@ public class GameResources {
         return object3dList.get(idLabel);
     }
 
-    public int getTextureID(String textureLabel) {
-        return textureList.get(textureLabel);
-    }
-
     public void isLoaded() {
         isLoaded = true;
     }
 
 
+    public int getTexture(String label) {
+        return textureList.get(label);
+    }
 }

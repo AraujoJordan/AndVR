@@ -1,7 +1,5 @@
 package araujo.jordan.andvr.engine.entity;
 
-import com.google.common.logging.nano.Vr;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +7,7 @@ import araujo.jordan.andvr.engine.VREngine;
 import araujo.jordan.andvr.engine.entity.components.BoxCollision;
 import araujo.jordan.andvr.engine.entity.components.Component;
 import araujo.jordan.andvr.engine.entity.components.Physics;
+import araujo.jordan.andvr.engine.entity.components.Texture;
 import araujo.jordan.andvr.engine.entity.components.Transformation;
 import araujo.jordan.andvr.engine.entity.components.model3d.Model3D;
 
@@ -25,6 +24,7 @@ public class Entity {
     private Model3D model3D;
     private Physics physics;
     private BoxCollision boxCollision;
+    private Texture texture;
 
     public Entity() {
         label = getClass().getCanonicalName();
@@ -109,6 +109,23 @@ public class Entity {
     }
 
     /**
+     * Use an cache to delivery the component
+     *
+     * @return the component on cache
+     */
+    public Texture getTexture() {
+        if (texture != null)
+            return texture;
+        for (Component component : components) {
+            if (component instanceof Texture) {
+                texture = (Texture) component;
+                return texture;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Remove the component from optimization variables (references) and from the list
      *
      * @param removeMe the variable that you want to be removed
@@ -123,6 +140,8 @@ public class Entity {
             boxCollision = null;
         if (removeMe instanceof Physics)
             physics = null;
+        if (removeMe instanceof Texture)
+            texture = null;
 
         //REMOVE FROM LIST TOO
         components.remove(removeMe);
@@ -130,7 +149,7 @@ public class Entity {
 
     public void run(VREngine engine) {
         for (Component component : components)
-            if(!(component instanceof Model3D)) {
+            if (!(component instanceof Model3D)) {
                 component.run(engine);
             }
     }

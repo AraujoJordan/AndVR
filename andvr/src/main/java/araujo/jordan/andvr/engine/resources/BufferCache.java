@@ -1,6 +1,5 @@
 package araujo.jordan.andvr.engine.resources;
 
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 
 /**
@@ -10,8 +9,8 @@ import java.util.HashMap;
 public class BufferCache {
     public static BufferCache instance = null;
 
-    public HashMap<String,int[]> modelBuffer;
-    public HashMap<String,Integer> textureBuffer;
+    public HashMap<String, int[]> modelBuffer = new HashMap<>();
+    public HashMap<String, Integer> textureBuffer = new HashMap<>();
 
     public static BufferCache getInstance() {
         if(instance == null) {

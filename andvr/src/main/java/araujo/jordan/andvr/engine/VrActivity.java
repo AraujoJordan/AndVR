@@ -14,7 +14,6 @@ import com.google.vr.sdk.base.Viewport;
 import javax.microedition.khronos.egl.EGLConfig;
 
 import araujo.jordan.andvr.R;
-import araujo.jordan.andvr.engine.renderer.GLUtils;
 
 /**
  * Created by jordan on 02/05/17.
@@ -22,16 +21,17 @@ import araujo.jordan.andvr.engine.renderer.GLUtils;
 
 public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
 
-    private static final float Z_NEAR = 0.5f;
+    private static final float Z_NEAR = 1.0f;
     private static final float Z_FAR = 1000f;
-    public float[] LIGHT_POS_IN_WORLD_SPACE = new float[]{200f, 200f, 200f, 1.0f};
+    public static float[] mLightPosInEyeSpace = new float[4];
     public static float[] mViewMatrix = new float[16];
     public static float[] mProjectionViewMatrix = new float[16];
-    public static float[] mLightEyeMatrix = new float[16];
-    private GvrView gvrView;
+    public float[] mLightPosInModelSpace = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
     public VREngine engine;
+    private GvrView gvrView;
     private float[] camera = new float[16];
-    private double theta = 0;
+    private float[] mLightModelMatrix = new float[16];
+    private float[] mLightPosInWorldSpace = new float[4];
 
 
     @Override
@@ -75,18 +75,21 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
     @Override
     public void onDrawEye(Eye eye) {
 
-        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
         GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
 
-        GLUtils.checkGlError("colorParam");
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
+        GLES32.glEnable(GLES32.GL_CULL_FACE);
 
         //-----------------------------------------------------------------------------------------
         //VIEW MATRIX CREATION
         Matrix.multiplyMM(mViewMatrix, 0, eye.getEyeView(), 0, camera, 0);
 
-        //UPDATE LIGHT
         //-----------------------------------------------------------------------------------------
-        Matrix.multiplyMV(mLightEyeMatrix, 0, mViewMatrix, 0, LIGHT_POS_IN_WORLD_SPACE, 0);
+        //UPDATE LIGHT
+        Matrix.setIdentityM(mLightModelMatrix, 0);
+        Matrix.translateM(mLightModelMatrix, 0, 0.0f, 0.0f, -1.0f);
+        Matrix.multiplyMV(mLightPosInWorldSpace, 0, mLightModelMatrix, 0, mLightPosInModelSpace, 0);
+        Matrix.multiplyMV(mLightPosInEyeSpace, 0, mViewMatrix, 0, mLightPosInWorldSpace, 0);
 
         //PROJECTION MATRIX CREATION
         float[] mProjectionMatrix = eye.getPerspective(Z_NEAR, Z_FAR);
@@ -94,12 +97,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
         //-----------------------------------------------------------------------------------------
         //PROJECTIONVIEW MATRIX CREATION
         Matrix.multiplyMM(mProjectionViewMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
-
-        //UPDATE THE MODELS WITH THE PROJECTIONVIEW MATRIX
-        GLES32.glFrontFace(GLES32.GL_CCW);
-        GLES32.glEnable(GLES32.GL_CULL_FACE);
-        GLES32.glCullFace(GLES32.GL_BACK);
-        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
 
         //DRAW MODEL3D COMPONENTS
         engine.draw();
@@ -115,7 +112,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
     @Override
     public void onSurfaceChanged(int i, int i1) {
 
-
     }
 
     public void setup(VREngine engine) {
@@ -124,7 +120,7 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
 
     @Override
     public void onSurfaceCreated(EGLConfig eglConfig) {
-        engine.initGeometry();
+        engine.loadIntoOpenGL();
     }
 
     @Override

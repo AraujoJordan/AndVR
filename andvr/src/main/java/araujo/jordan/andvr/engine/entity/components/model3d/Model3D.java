@@ -9,7 +9,6 @@ import araujo.jordan.andvr.engine.entity.components.Component;
 import araujo.jordan.andvr.engine.entity.components.Transformation;
 import araujo.jordan.andvr.engine.math.Vector3D;
 import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
-import araujo.jordan.andvr.engine.resources.object3D.ManualWavefront;
 
 /**
  * Created by arauj on 05/03/2017.
@@ -20,13 +19,9 @@ public class Model3D extends Component {
     private final float width, height, depth;
     private final Vector3D centerOfModel;
     private final GenericObject3D obj3D;
-
-    private ModelDrawVR shape;
-    private int textureID;
-
-    private VREngine engine;
-    private Color color = null;
     public String resourceLabel;
+    private ModelDrawVR shape;
+    private VREngine engine;
 
     public Model3D(String resourceLabel, VREngine engine) {
         this.resourceLabel = resourceLabel;
@@ -56,7 +51,7 @@ public class Model3D extends Component {
         this.depth = obj3D.depth;
         this.centerOfModel = obj3D.center;
         this.engine = engine;
-        this.color = color;
+//        this.color = color;
     }
 
     public Model3D(String resourceLabel, String textureLabel, VREngine engine) {
@@ -64,29 +59,12 @@ public class Model3D extends Component {
         this.resourceLabel = resourceLabel;
 
         obj3D = engine.resouces.get3DModel(resourceLabel);
-        textureID = engine.resouces.getTextureID(textureLabel);
 
         this.width = obj3D.width;
         this.height = obj3D.height;
         this.depth = obj3D.depth;
         this.centerOfModel = obj3D.center;
         this.engine = engine;
-    }
-
-    public Model3D(String resourceLabel, String textureLabel, VREngine engine, Color color) {
-        super();
-
-        this.resourceLabel = resourceLabel;
-
-        obj3D = engine.resouces.get3DModel(resourceLabel);
-        textureID = engine.resouces.getTextureID(textureLabel);
-
-        this.width = obj3D.width;
-        this.height = obj3D.height;
-        this.depth = obj3D.depth;
-        this.centerOfModel = obj3D.center;
-        this.engine = engine;
-        this.color = color;
     }
 
     @Override
@@ -118,12 +96,7 @@ public class Model3D extends Component {
         if (shape != null)
             return;
 
-        shape = new ModelDrawVR(resourceLabel, obj3D, textureID, engine, parentEntity, color);
-    }
-
-    public void setColor(Color color) {
-        if (shape != null)
-            shape.setColor(color);
+        shape = new ModelDrawVR(resourceLabel, obj3D, engine, parentEntity);
     }
 
     public float getWidth() {
