@@ -27,7 +27,7 @@ public class ModelDrawVR implements Draw {
     private static final int COORDS_PER_VERTEX = 3; // number of coordinates per vertex in this array
     private static final int POSITION_DATA_SIZE = 3;
     private static final int NORMAL_DATA_SIZE = 3;
-    private static final int TEXTURE_COORDINATE_DATA_SIZE = 2;
+    private static final int TEXTURE_COORDINATE_DATA_SIZE = 3;
     private static final int BYTES_PER_FLOAT = 4;
 
     private final int[] buffers;
@@ -41,13 +41,15 @@ public class ModelDrawVR implements Draw {
     private final int mLightPosHandle;
     private final int mTextureCoordinateHandle;
     private final int mTextureUniformHandle;
+    private final int mTextureDataHandle;
 
-    private int mTextureDataHandle;
+    private final int vertexCount;
 
-    private int vertexCount;
+    private final Entity parentEntity;
+    private final VREngine engine;
 
-    private Entity parentEntity;
-    private VREngine engine;
+    //Used for speed
+    private float[] MVPmatrix = new float[16];
 
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
@@ -96,7 +98,8 @@ public class ModelDrawVR implements Draw {
         //TEXTURES
         if (parentEntity.getTexture() != null) {
             mTextureDataHandle = parentEntity.getTexture().initTexture();
-        }
+        } else
+            mTextureDataHandle = -1;
 
         //INIT VBO
         if (bufferCache.modelBuffer.containsKey(objectID)) {
@@ -119,19 +122,15 @@ public class ModelDrawVR implements Draw {
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, 0);
 
         //CLEAR MEMORY
-        vertexBuffer.clear();
-        normalBuffer.clear();
-        textureCoordsBuffer.clear();
+//        vertexBuffer.clear();
+//        normalBuffer.clear();
+//        textureCoordsBuffer.clear();
     }
 
     /**
      * Encapsulates the OpenGL ES instructions for drawing the triangle.
      */
     public void draw() {
-
-        //Calculate mvp for this object
-        float[] modelViewProjMatrix = new float[16];
-        Matrix.multiplyMM(modelViewProjMatrix, 0, VrActivity.mProjectionViewMatrix, 0, parentEntity.getTransformation().modelMatrix, 0);
 
         GLES32.glUseProgram(mProgram);
 
@@ -144,29 +143,16 @@ public class ModelDrawVR implements Draw {
         // Set the ModelView in the shader, used to calculate lighting
         GLES32.glUniformMatrix4fv(modelModelViewParam, 1, false, modelView, 0);
 
-        // Set the ModelViewProjection matrix in the shader.
-        GLES32.glUniformMatrix4fv(modelModelViewProjectionParam, 1, false, modelViewProjMatrix, 0);
+        //Calculate mvp for this object
+        Matrix.multiplyMM(MVPmatrix, 0, VrActivity.mProjectionViewMatrix, 0, parentEntity.getTransformation().modelMatrix, 0);
+
+        // Set the ModelViewProjection matrix in the shader
+        GLES32.glUniformMatrix4fv(modelModelViewProjectionParam, 1, false, MVPmatrix, 0);
 
         // Pass in the light position in eye space.
         GLES32.glUniform3f(mLightPosHandle, VrActivity.mLightPosInEyeSpace[0], VrActivity.mLightPosInEyeSpace[1], VrActivity.mLightPosInEyeSpace[2]);
 
-        //Vertex Array Object (VAO)
-
-        /*
-        // Set the position of theVertex Buffer Object model
-        GLES32.glVertexAttribPointer(
-                modelPositionParam, COORDS_PER_VERTEX, GLES32.GL_FLOAT, false, 0, vertexBuffer);
-
-
-        // Set the normal positions of the model, again for shading
-        GLES32.glVertexAttribPointer(modelNormalParam, 3, GLES32.GL_FLOAT, false, 0, normalBuffer);
-
-        // Set the colors of the model
-        GLES32.glVertexAttribPointer(modelColorParam, 4, GLES32.GL_FLOAT, false, 0, colorBuffer);
-
-        // Set UVW of the model
-        GLES32.glVertexAttribPointer(mTextureCoordinateHandle, 2, GLES32.GL_FLOAT, false, 0, textureCoordsBuffer);
-        */
+        // Vertex Buffer Object (VBO)
 
         // Blind Texture
         if (parentEntity.getTexture() != null) {
@@ -175,28 +161,30 @@ public class ModelDrawVR implements Draw {
             GLES32.glUniform1i(mTextureUniformHandle, 0);
         }
 
-        // Vertex Buffer Object (VBO)
-        // Pass in the position information
+        // Pass in the position buffer id
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[0]);
         GLES32.glEnableVertexAttribArray(modelPositionParam);
         GLES32.glVertexAttribPointer(modelPositionParam, POSITION_DATA_SIZE, GLES32.GL_FLOAT, false, 0, 0);
 
-        // Pass in the normal information
+        // Pass in the normal buffer id
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[1]);
         GLES32.glEnableVertexAttribArray(modelNormalParam);
         GLES32.glVertexAttribPointer(modelNormalParam, NORMAL_DATA_SIZE, GLES32.GL_FLOAT, false, 0, 0);
 
-        // Pass in the texture information
+        // Pass in the texture buffer id
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[2]);
         GLES32.glEnableVertexAttribArray(mTextureCoordinateHandle);
         GLES32.glVertexAttribPointer(mTextureCoordinateHandle, TEXTURE_COORDINATE_DATA_SIZE, GLES32.GL_FLOAT, false,
                 0, 0);
 
+
+
         // Bind buffers
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, 0);
+
         // Draw all
         GLES32.glDrawArrays(GLES32.GL_TRIANGLES, 0, vertexCount);
-        GLUtils.checkGlError("Drawing model");
+//        GLUtils.checkGlError("Drawing model");
     }
 
     /**

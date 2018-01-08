@@ -28,16 +28,17 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
     private Camera camera;
     private GameResources resources;
     private Timer timer;
+    Random rand = new Random();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         resources = new GameResources();
-        resources.addOBJ(this, "cube", "duck.obj");
+        resources.addOBJ(this, "cube", "porche.obj");
 //        resources.addOBJ(this, "bird", "bird-flat.obj");
 //        resources.addOBJ(this, "porche", "porche.obj");
-        resources.addTexture("cube", R.drawable.ducktexture);
+        resources.addTexture("cube", R.drawable.porchejp);
 
         gameEngine = new VREngine(this, resources, this);
 
@@ -46,7 +47,7 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         gameEngine.addCamera(camera);
 
         Entity superCar = new Entity("cube");
-        superCar.addComponent(new Transformation(0, 0, -4f));
+        superCar.addComponent(new Transformation(0, 0, -4));
         superCar.addComponent(new Model3D("cube", gameEngine,
                 new Color(1f, 0f, 0f, 1f)));
         superCar.addComponent(new Texture(gameEngine, "cube"));
@@ -76,19 +77,20 @@ public class GameActivity extends VrActivity implements VREngine.GameUpdates {
         fps++;
         increment++;
         Vector3D rot3D = entitiesListForTrans.get(0).getTransformation().getRotation();
-        rot3D.xyz[0] = increment;
-        rot3D.xyz[1] = increment;
-        rot3D.xyz[2] = increment;
+        rot3D.xyz[0] = ((float) increment)/10f;
+        rot3D.xyz[1] = ((float) increment)/20f;
+        rot3D.xyz[2] = ((float) increment)/30f;
 
         for (Entity entity : entitiesListForTrans) {
             entity.getTransformation().setRotation(rot3D);
         }
+
     }
 
     public ArrayList<Entity> addObjects(int many) {
 
         ArrayList<Entity> birdsList = new ArrayList<>();
-        Random rand = new Random();
+
         final int max = 10;
         final int min = -10;
 

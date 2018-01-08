@@ -1,8 +1,11 @@
 package araujo.jordan.andvr.engine.entity;
 
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.google.vr.sdk.base.HeadTransform;
+
+import java.util.Arrays;
 
 import araujo.jordan.andvr.engine.entity.components.Transformation;
 import araujo.jordan.andvr.engine.math.Vector3D;
@@ -31,16 +34,12 @@ public class Camera extends Entity {
         return new Vector3D(floatDirection[0], floatDirection[1], floatDirection[2]);
     }
 
-    public float[] updateCamera(HeadTransform headTransform) {
+    public void updateCamera(HeadTransform headTransform) {
         this.headTransform = headTransform;
 
         Vector3D camTrans = getTransformation().getTranslation();
+        //headview matrix == lookAtMatrix
 
-        //update camera vector
-        Matrix.setLookAtM(cameraMatrix, 0,
-                camTrans.xyz[0], camTrans.xyz[1], camTrans.xyz[2] + CAMERA_DISTANCE,
-                camTrans.xyz[0], camTrans.xyz[1], camTrans.xyz[2],
-                0, 1, 0);
 
         if (entityToFollowCamera != null) {
             float[] euler = new float[3];
@@ -50,7 +49,7 @@ public class Camera extends Entity {
             euler[1] = (float) ((euler[1]+ Math.PI)*57.2958f); //in degree
             euler[2] = (float) ((euler[2]+ Math.PI)*57.2958f); //in degree
 
-//            Log.d("conLook", Arrays.toString(euler));
+            Log.d("conLook", Arrays.toString(euler));
 
             //ROTATE THE BIRD
             entityToFollowCamera.getTransformation().setRotation(new Vector3D(0,(euler[1]),0f));
@@ -68,7 +67,6 @@ public class Camera extends Entity {
             entityToFollowCamera.getTransformation().setTranslation(birdPos);
 
         }
-        return cameraMatrix;
     }
 
     public void follow(Entity entity) {

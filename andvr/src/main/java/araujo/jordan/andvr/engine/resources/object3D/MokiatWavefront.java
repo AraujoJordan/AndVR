@@ -62,7 +62,7 @@ public class MokiatWavefront extends GenericObject3D {
                             if(reference.hasTexCoordIndex()) {
                                 final OBJTexCoord objTexCoord = model.getTexCoord(reference);
                                 txtcoords.add(objTexCoord.u);
-                                txtcoords.add(objTexCoord.v);
+                                txtcoords.add(1.0f-objTexCoord.v);
                                 txtcoords.add(objTexCoord.w);
                             }
                         }
@@ -77,8 +77,11 @@ public class MokiatWavefront extends GenericObject3D {
                 final MTLLibrary library = mtlParser.parse(mtlStream);
                 for (MTLMaterial material : library.getMaterials()) {
                     final MTLColor diffuseColor = material.getDiffuseColor();
+
+
                     final MTLColor ambientColor = material.getAmbientColor();
                     final MTLColor specularColor = material.getSpecularColor();
+
                 }
             }
         }

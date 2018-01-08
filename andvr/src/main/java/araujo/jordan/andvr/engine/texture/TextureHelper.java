@@ -36,6 +36,9 @@ public class TextureHelper {
         // Load the bitmap into the bound texture.
         GLUtils.texImage2D(GLES32.GL_TEXTURE_2D, 0, bitmap, 0);
 
+        GLES32.glGenerateMipmap(GLES32.GL_TEXTURE_2D);
+        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, textureHandle[0]);
+
         // Recycle the bitmap, since its data has been loaded into OpenGL.
         bitmap.recycle();
 

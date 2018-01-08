@@ -22,6 +22,9 @@
     <uses-feature
         android:name="android.hardware.vr.high_performance"
         android:required="false" />
+    <uses-feature
+        android:name="android.hardware.opengles.aep"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
