@@ -34,11 +34,14 @@ public class Camera extends Entity {
         return new Vector3D(floatDirection[0], floatDirection[1], floatDirection[2]);
     }
 
-    public void updateCamera(HeadTransform headTransform) {
+    public float[] updateCamera(HeadTransform headTransform) {
         this.headTransform = headTransform;
 
         Vector3D camTrans = getTransformation().getTranslation();
-        //headview matrix == lookAtMatrix
+        Matrix.setLookAtM(cameraMatrix, 0,
+                camTrans.xyz[0], camTrans.xyz[1], camTrans.xyz[2] + CAMERA_DISTANCE,
+                camTrans.xyz[0], camTrans.xyz[1], camTrans.xyz[2],
+                0, 1, 0);
 
 
         if (entityToFollowCamera != null) {
@@ -67,6 +70,7 @@ public class Camera extends Entity {
             entityToFollowCamera.getTransformation().setTranslation(birdPos);
 
         }
+        return cameraMatrix;
     }
 
     public void follow(Entity entity) {

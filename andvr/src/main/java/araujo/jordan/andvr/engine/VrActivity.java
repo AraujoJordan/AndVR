@@ -26,7 +26,6 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
     public static float[] mLightPosInEyeSpace = new float[4];
     public static float[] mViewMatrix = new float[16];
     public static float[] mProjectionViewMatrix = new float[16];
-    public float[] mLightPosInModelSpace = new float[]{0.0f, 0.0f, 10.0f, 1.0f};
     public VREngine engine;
     private GvrView gvrView;
     private float[] lookAtMatrix = new float[16];
@@ -67,17 +66,16 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
         GLES32.glClearColor(0.529411765f, 0.807843137f, 0.980392157f, 1.0f);
 
         //Get the lookAtMatrix
-        headTransform.getHeadView(lookAtMatrix,0);
-//        Matrix.setLookAtM(cameraMatrix, 0,
-//                camTrans.xyz[0], camTrans.xyz[1], camTrans.xyz[2] + CAMERA_DISTANCE,
-//                camTrans.xyz[0], camTrans.xyz[1], camTrans.xyz[2],
-//                0, 1, 0);
-//        engine.getCamera().updateCamera(headTransform);
+        lookAtMatrix = engine.getCamera().updateCamera(headTransform);
 
         //Init Light
-        Matrix.setIdentityM(mLightModelMatrix, 0);
-        Matrix.translateM(mLightModelMatrix, 0, 0.0f, 0.0f, -1.0f);
-        Matrix.multiplyMV(mLightPosInWorldSpace, 0, mLightModelMatrix, 0, mLightPosInModelSpace, 0);
+        if (engine.light != null) {
+            Matrix.setIdentityM(mLightModelMatrix, 0);
+            Matrix.translateM(mLightModelMatrix, 0, 0.0f, 0.0f, -1.0f);
+            Matrix.multiplyMV(mLightPosInWorldSpace, 0, mLightModelMatrix, 0,
+                    new float[]{engine.light.position.xyz[0], engine.light.position.xyz[1], engine.light.position.xyz[2], 1.0f},
+                    0);
+        }
 
         //Update engine logic
         engine.engineUpdates();
@@ -93,8 +91,9 @@ public class VrActivity extends GvrActivity implements GvrView.StereoRenderer {
         Matrix.multiplyMM(mViewMatrix, 0, eye.getEyeView(), 0, lookAtMatrix, 0);
 
         // Put light in the correct position of the eye side
-        Matrix.multiplyMV(mLightPosInEyeSpace, 0, mViewMatrix, 0, mLightPosInWorldSpace, 0);
-
+        if (engine.light != null) {
+            Matrix.multiplyMV(mLightPosInEyeSpace, 0, mViewMatrix, 0, mLightPosInWorldSpace, 0);
+        }
         // Update the projection Matrix
         mProjectionMatrix = eye.getPerspective(Z_NEAR, Z_FAR);
 

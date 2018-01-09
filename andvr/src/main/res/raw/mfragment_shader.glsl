@@ -15,7 +15,7 @@ void main()
 {
 
 	// Will be used for attenuation.
-    float distance = length(u_LightPos - v_Position);
+//    float distance = length(u_LightPos - v_Position)+0.0001;
 
 	// Get a lighting direction vector from the light to the vertex.
     vec3 lightVector = normalize(u_LightPos - v_Position);
@@ -25,13 +25,16 @@ void main()
     float diffuse = max(dot(v_Normal, lightVector), 0.0);
 
 	// Add attenuation.
-    diffuse = diffuse;//* (1.0 / distance);
+//    diffuse = diffuse;//* (1.0 / (distance/(v_lightPower+0.0001)));
 
-    // Add ambient lighting     DEFAULT: 0.2
-    diffuse = diffuse + 0.2;
+    //specular light
+    float specularCoefficient = pow(max(0.0, dot(v_Position, reflect(lightVector, v_Normal))), 0.95);
+
+    float ambientLight = 0.2;
+    float lightPower = (specularCoefficient/25.0) + (diffuse + 0.4);
 
 	// Multiply the color by the diffuse illumination level and texture value to get final output color.
-    gl_FragColor = (diffuse * texture2D(u_Texture, v_TexCoordinate));
+    gl_FragColor = (lightPower * texture2D(u_Texture, v_TexCoordinate));
     gl_FragColor[3] = 1.0;
 
   }

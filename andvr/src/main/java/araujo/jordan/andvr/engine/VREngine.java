@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import araujo.jordan.andvr.engine.entity.Camera;
 import araujo.jordan.andvr.engine.entity.Entity;
+import araujo.jordan.andvr.engine.entity.Light;
 import araujo.jordan.andvr.engine.resources.GameResources;
 
 
@@ -19,6 +20,7 @@ public class VREngine {
     public GameResources resouces;
     public GameUpdates updates;
     public Camera camera;
+    public Light light;
     public VrActivity vrAct;
     public boolean runningEngine;
     private ArrayList<Entity> entities;
@@ -100,12 +102,18 @@ public class VREngine {
     }
 
     public void addEntity(Entity entity) {
-//        entitiesChange = true;
+        if (entity instanceof Light) {
+            light = (Light) entity;
+            return;
+        }
+        if (entity instanceof Camera) {
+            camera = (Camera) entity;
+            return;
+        }
         entities.add(entity);
     }
 
     public void removeEntity(Entity entity) {
-//        entitiesChange = true;
         entities.remove(entity);
     }
 
@@ -126,8 +134,8 @@ public class VREngine {
 
 //        if (elementsPerThread < 1f) {// SINGLE_CORE
 
-            for (Entity entity : entities)
-                entity.run(this);
+        for (Entity entity : entities)
+            entity.run(this);
 
 //        } else {// MULTI_CORE
 //
@@ -150,7 +158,7 @@ public class VREngine {
 //            uiBlocker.waitProcess();
 
 //            Log.e("TIMESPENT","Time: "+(new Date().getTime() - initialTIme));
-        }
+    }
 //    }
 
 //    public boolean allTasksComplete() {
@@ -183,6 +191,10 @@ public class VREngine {
 
     public void addCamera(Camera camera) {
         this.camera = camera;
+    }
+
+    public void addLight(Light light) {
+        this.light = light;
     }
 
     public interface GameUpdates {

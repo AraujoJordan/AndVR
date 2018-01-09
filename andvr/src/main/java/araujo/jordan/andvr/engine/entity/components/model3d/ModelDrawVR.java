@@ -14,7 +14,6 @@ import araujo.jordan.andvr.R;
 import araujo.jordan.andvr.engine.VREngine;
 import araujo.jordan.andvr.engine.VrActivity;
 import araujo.jordan.andvr.engine.entity.Entity;
-import araujo.jordan.andvr.engine.renderer.GLUtils;
 import araujo.jordan.andvr.engine.resources.BufferCache;
 import araujo.jordan.andvr.engine.resources.object3D.GenericObject3D;
 
@@ -41,10 +40,11 @@ public class ModelDrawVR implements Draw {
     private final int mLightPosHandle;
     private final int mTextureCoordinateHandle;
     private final int mTextureUniformHandle;
+//    private int mLightPowerHandle;
+
     private final int mTextureDataHandle;
 
     private final int vertexCount;
-
     private final Entity parentEntity;
     private final VREngine engine;
 
@@ -60,24 +60,14 @@ public class ModelDrawVR implements Draw {
 
         vertexCount = obj3D.vertSize / COORDS_PER_VERTEX;
 
-        FloatBuffer vertexBuffer;
-        FloatBuffer normalBuffer;
-        FloatBuffer textureCoordsBuffer;
+        FloatBuffer vertexBuffer = obj3D.vertBuffer.getFloatBuffer();
+        FloatBuffer normalBuffer = obj3D.normalBuffer.getFloatBuffer();
+        FloatBuffer textureCoordsBuffer = obj3D.uvwBuffer.getFloatBuffer();
 
-        vertexBuffer = obj3D.vertBuffer.getFloatBuffer();
-        normalBuffer = obj3D.normalBuffer.getFloatBuffer();
-        textureCoordsBuffer = obj3D.uvwBuffer.getFloatBuffer();
-
-        int vertexShader;
-        int passthroughShader;
-
-        // prepare shaders and OpenGL program
-        vertexShader = loadGLShader(GLES32.GL_VERTEX_SHADER, R.raw.mvertex_shader);
-        passthroughShader = loadGLShader(GLES32.GL_FRAGMENT_SHADER, R.raw.mfragment_shader);
-
+        // Prepare shaders and OpenGL program
         mProgram = GLES32.glCreateProgram();
-        GLES32.glAttachShader(mProgram, vertexShader);
-        GLES32.glAttachShader(mProgram, passthroughShader);
+        GLES32.glAttachShader(mProgram, loadGLShader(GLES32.GL_VERTEX_SHADER, R.raw.mvertex_shader));
+        GLES32.glAttachShader(mProgram, loadGLShader(GLES32.GL_FRAGMENT_SHADER, R.raw.mfragment_shader));
         GLES32.glLinkProgram(mProgram);
         GLES32.glUseProgram(mProgram);
 
@@ -86,6 +76,8 @@ public class ModelDrawVR implements Draw {
         modelNormalParam = GLES32.glGetAttribLocation(mProgram, "a_Normal");
         mTextureCoordinateHandle = GLES32.glGetAttribLocation(mProgram, "a_TexCoordinate");
         mTextureUniformHandle = GLES32.glGetUniformLocation(mProgram, "u_Texture");
+//        if (engine.light != null)
+//            mLightPowerHandle = GLES32.glGetUniformLocation(mProgram, "a_lightPower");
 
         modelModelParam = GLES32.glGetUniformLocation(mProgram, "u_Model");
         modelModelViewParam = GLES32.glGetUniformLocation(mProgram, "u_MVMatrix");
@@ -161,6 +153,10 @@ public class ModelDrawVR implements Draw {
             GLES32.glUniform1i(mTextureUniformHandle, 0);
         }
 
+//        if (engine.light != null) {
+//            GLES32.glUniform1f(mLightPowerHandle, engine.light.power);
+//        }
+
         // Pass in the position buffer id
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, buffers[0]);
         GLES32.glEnableVertexAttribArray(modelPositionParam);
@@ -176,7 +172,6 @@ public class ModelDrawVR implements Draw {
         GLES32.glEnableVertexAttribArray(mTextureCoordinateHandle);
         GLES32.glVertexAttribPointer(mTextureCoordinateHandle, TEXTURE_COORDINATE_DATA_SIZE, GLES32.GL_FLOAT, false,
                 0, 0);
-
 
 
         // Bind buffers
